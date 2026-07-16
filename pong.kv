@@ -1,0 +1,106 @@
+#:kivy 2.0.0
+
+<PongBall>:
+    size: 30, 30
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Ellipse:
+            pos: self.pos
+            size: self.size
+
+<PongPaddle>:
+    size: 20, 100
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<StartScreen>:
+    FloatLayout:
+        canvas.before:
+            Color:
+                rgba: 0.05, 0.05, 0.05, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: "Pong Game"
+            font_size: 44
+            bold: True
+            pos_hint: {"center_x": 0.5, "center_y": 0.6}
+
+        Button:
+            text: "Start"
+            font_size: 26
+            size_hint: None, None
+            size: 220, 70
+            pos_hint: {"center_x": 0.5, "center_y": 0.4}
+            on_release: app.go_to_game()
+
+<GameScreen>:
+    PongGame:
+        id: pong_widget
+
+<PongGame>:
+    ball: pong_ball
+    player1: player_left
+    player2: player_right
+
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 0.3
+        Rectangle:
+            pos: self.center_x - 2, 0
+            size: 4, self.height
+
+        # نشانگر دروازه‌ی سمت چپ (امتیاز برای بازیکن راست) — فقط به اندازه‌ی محدوده‌ی واقعی گل
+        Color:
+            rgba: 1, 0.3, 0.3, 0.8
+        Rectangle:
+            pos: self.x, self.center_y - root.goal_half_height
+            size: 8, root.goal_half_height * 2
+
+        # نشانگر دروازه‌ی سمت راست (امتیاز برای بازیکن چپ)
+        Color:
+            rgba: 0.3, 0.5, 1, 0.8
+        Rectangle:
+            pos: self.right - 8, self.center_y - root.goal_half_height
+            size: 8, root.goal_half_height * 2
+
+    Label:
+        font_size: 60
+        center_x: root.width / 4
+        top: root.top - 40
+        text: str(root.player1.score)
+
+    Label:
+        font_size: 60
+        center_x: root.width * 3 / 4
+        top: root.top - 40
+        text: str(root.player2.score)
+
+    PongBall:
+        id: pong_ball
+        center: self.parent.center
+
+    PongPaddle:
+        id: player_left
+        is_left_paddle: True
+        center: root.x + root.width / 4, root.height / 2
+
+    PongPaddle:
+        id: player_right
+        is_left_paddle: False
+        center: root.right - root.width / 4, root.height / 2
+
+    # متن برنده، وسط صفحه، فقط وقتی بازی تموم شده نشون داده می‌شه
+    Label:
+        text: root.winner_text
+        font_size: 50
+        bold: True
+        center: root.center
+        opacity: 1 if root.winner_text else 0
